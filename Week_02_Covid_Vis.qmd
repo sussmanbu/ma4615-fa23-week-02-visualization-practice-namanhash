@@ -1,7 +1,7 @@
 ---
 title: "Week 02: COVID Visualization Activity"
 date: "September, 11 2023"
-author: "**`[[`**Your Name**`]]`**"
+author: "Naman Nagaria"
 ---
 
 Today, we'll be working with a data set related to COVID.
@@ -39,3 +39,30 @@ covid_data_count |>
 2. Are there any conclusions you can draw?
 3. What were you not able to do due to not having the R knowledge?
 4. What other data would be useful to better understand this data?
+
+Question 1) I have made a few graphs for this question.
+The first plot is a graph of time vs death, colored according to total deaths, cases, tests and hosp. The graph when scaled to log 10 shows there is similar kind of growth in log 10 of deaths, cases, tests and hosp while without log 10 scaling, the growth rate varies a lot.
+The second plot is a 4 dimension scatterplot of death vs cases, and size of dot for population and color for race. We can see that most of the point lie of a straight line when both of the axis are scaled to log 10.
+The third plot is a time vs cases density line graph. We observe that while white cases started earlier, multiracial cases peaked higher. 
+```{r}
+library(dplyr)
+library(ggplot2)
+new_data_cases <- filter(covid_data_race, count_type == 'Cases')
+
+a <- covid_data_count %>% filter (race != 'Total') %>% select(-c('state', 'state_name', 'race'))
+b <- aggregate(.~date, a, sum)
+al <- covid_data_count %>% filter (race != 'Total') %>% select(-c('state', 'state_name'))
+ggplot(b, aes(x=date)) + geom_line(aes(y=Deaths)) + geom_line(aes(y=Cases), color='red')+ geom_line(aes(y=Tests), color = 'blue')+geom_line(aes(y=Hosp), color='brown') +scale_y_continuous(trans = "log10")
+beta <- aggregate(.~race, al, sum)
+ggplot(beta, aes(x=Cases, y=Deaths)) + geom_point(aes(size=population, color=race)) +scale_x_continuous(trans = "log10")+scale_y_continuous(trans = "log10")
+alpha <- aggregate(.~race+date, al, sum)
+alpha<- select(alpha,c('date','race','Cases'))
+ggplot(alpha, aes(x = date, color = race)) + geom_density(linewidth = 0.75) 
+```
+Question 2) There is not much more that can be learned apart form what was already stated in the question above. However, the third graph shows that whites had higher number of cases in the beginning which probably indicates that they had easier access to tests. Also, Multiracial group peaked higher, suggesting tougher access to tests initially and peaked once they had access to it.The second graph doesnt tell much but the blacks and AIAN had a higher ratio of deaths per cases, indicating poor health care facilities. We can conclude this because they lie above the 45degree line that would divide deaths and cases across the graph.
+```
+```
+Question 3) I had limited knowledge of other packages and also had very less knowledge about commands like filter and select. A better knowledge about these will help me make better conclusions about data as I will be able to sort and divide data according to need.
+```
+```
+Question 4) Another data that would be useful will be the poverty level of these population according to race. This would help us in making better correlation between accessibility to health care, poverty and vulnerability to covid as some races are more dependent on physical work and are more vulnerable to covid as compared to others who can work from teh luxury of their homes.
